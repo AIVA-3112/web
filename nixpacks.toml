@@ -1,0 +1,14 @@
+# Nixpacks configuration for the frontend application
+[phases.setup]
+  [phases.setup.packages]
+    node = "18.x"
+
+[phases.install]
+  cmds = ["npm ci"]
+
+[phases.build]
+  cmds = ["npm run build"]
+
+[phases.start]
+  cmd = "npm run preview"
+  ports = ["5173"]
