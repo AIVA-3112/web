@@ -1,8 +1,6 @@
 // API utility functions for frontend components
 
-const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://aiva-chat-app.azurewebsites.net/api' 
-  : 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://web-production-50913.up.railway.app/api';
 
 // Get auth token from localStorage
 const getAuthToken = () => {

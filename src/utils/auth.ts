@@ -5,18 +5,15 @@ export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'your-g
 export const MICROSOFT_CLIENT_ID = import.meta.env.VITE_MICROSOFT_CLIENT_ID || '613e41ad-ed10-491c-8788-b42f488aaa29';
 export const MICROSOFT_TENANT_ID = import.meta.env.VITE_MICROSOFT_TENANT_ID || '53be55ec-4183-4a38-8c83-8e6e12e2318a';
 export const YAHOO_CLIENT_ID = import.meta.env.VITE_YAHOO_CLIENT_ID || 'your-yahoo-client-id';
+export const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
 
 // Microsoft Authentication Library (MSAL) configuration
 export const msalConfig: Configuration = {
   auth: {
     clientId: MICROSOFT_CLIENT_ID,
     authority: `https://login.microsoftonline.com/${MICROSOFT_TENANT_ID}`,
-    redirectUri: import.meta.env.PROD 
-      ? 'https://aiva-chat-app.azurewebsites.net' 
-      : 'http://localhost:5173',
-    postLogoutRedirectUri: import.meta.env.PROD 
-      ? 'https://aiva-chat-app.azurewebsites.net' 
-      : 'http://localhost:5173',
+    redirectUri: APP_URL,
+    postLogoutRedirectUri: APP_URL,
   },
   cache: {
     cacheLocation: 'sessionStorage',
