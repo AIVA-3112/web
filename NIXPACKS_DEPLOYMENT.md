@@ -8,9 +8,35 @@ Nixpacks is a tool that automatically generates optimized Docker images for appl
 
 ## Prerequisites
 
-1. Install Nixpacks: https://nixpacks.com/docs/installation
+1. Install Nixpacks: See [INSTALL_NIXPACKS.md](file:///c%3A/Users/chint/Downloads/webapp_1%20-%20Copy/INSTALL_NIXPACKS.md) for detailed installation instructions
 2. Docker (for local testing)
 3. An account with a container registry (Docker Hub, GitHub Container Registry, etc.)
+
+## Installing Nixpacks
+
+For quick installation, see [INSTALL_NIXPACKS.md](file:///c%3A/Users/chint/Downloads/webapp_1%20-%20Copy/INSTALL_NIXPACKS.md). Here are the most common installation methods:
+
+### Windows (PowerShell as Administrator)
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm https://nixpacks.com/install.ps1 | iex
+```
+
+### macOS (with Homebrew)
+```bash
+brew tap railwayapp/nixpacks
+brew install nixpacks
+```
+
+### Linux/macOS (curl)
+```bash
+curl -L https://nixpacks.com/install.sh | bash
+```
+
+Verify installation:
+```bash
+nixpacks --version
+```
 
 ## Building with Nixpacks
 

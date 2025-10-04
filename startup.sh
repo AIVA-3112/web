@@ -1,26 +1,13 @@
 #!/bin/bash
 
-# Install frontend dependencies
-echo "Installing frontend dependencies..."
+# Install dependencies
+echo "Installing dependencies..."
 npm install
 
-# Build frontend
+# Build the frontend application
 echo "Building frontend..."
 npm run build
 
-# Copy built frontend files to server public directory
-echo "Copying frontend build to server..."
-cp -r dist/* server/public/
-
-# Install server dependencies
-echo "Installing server dependencies..."
-cd server
-npm install
-
-# Build server
-echo "Building server..."
-npm run build
-
-# Start the application
+# Start the preview server (this will serve the built files)
 echo "Starting application..."
-node dist/index.js
+npm run preview

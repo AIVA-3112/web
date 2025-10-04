@@ -11,9 +11,9 @@ export default defineConfig(({ mode }) => ({
     strictPort: true,
     proxy: {
       "/api": {
-        target: "http://localhost:3001",
+        target: "https://web-production-50913.up.railway.app",
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
     },
   },
