@@ -47,6 +47,10 @@ app.use('/api', createProxyMiddleware({
     if (proxyRes.headers['content-type'] && proxyRes.headers['content-type'].includes('image')) {
       proxyRes.headers['Cache-Control'] = 'public, max-age=31536000'; // Cache images for 1 year
     }
+  },
+  onError: function (err, req, res) {
+    console.error('Proxy error:', err);
+    res.status(500).json({ error: 'Proxy error', message: err.message });
   }
 }));
 
@@ -55,12 +59,35 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 // Handle SPA routing - serve index.html for all non-API routes
 app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  try {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  } catch (error) {
+    console.error('Error serving index.html:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Test endpoint
+app.get('/test', (req, res) => {
+  res.status(200).json({ 
+    message: 'Server is running correctly', 
+    timestamp: new Date().toISOString(),
+    nodeVersion: process.version
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ 
+    error: 'Internal Server Error', 
+    message: err.message 
+  });
 });
 
 // Get port from environment variable or default to 8080
@@ -71,6 +98,11 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(`Health check endpoint: http://localhost:${PORT}/health`);
   console.log(`API Base URL: ${API_BASE_URL}`);
+  console.log(`Node version: ${process.version}`);
+})
+.on('error', (err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });
 
 // Handle graceful shutdown
