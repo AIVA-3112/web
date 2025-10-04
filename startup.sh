@@ -9,5 +9,5 @@ echo "Building frontend..."
 npm run build
 
 # Start the preview server (this will serve the built files)
-echo "Starting application..."
+echo "Starting application on port 8080..."
 npm run preview

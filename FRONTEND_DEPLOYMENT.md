@@ -35,7 +35,7 @@ See [AZURE_APP_SERVICES_DEPLOYMENT.md](file:///c%3A/Users/chint/Downloads/webapp
    ```env
    VITE_API_URL=https://web-production-50913.up.railway.app/api
    VITE_APP_URL=https://your-app-name.azurewebsites.net
-   PORT=5173
+   PORT=8080
    NODE_ENV=production
    ```
 
@@ -46,7 +46,7 @@ See [NIXPACKS_DEPLOYMENT.md](file:///c%3A/Users/chint/Downloads/webapp_1%20-%20C
 #### Quick Start for Nixpacks:
 ```bash
 nixpacks build . -n aiva-frontend
-docker run -p 5173:5173 aiva-frontend
+docker run -p 8080:8080 aiva-frontend
 ```
 
 ### 3. Traditional Node.js Server Deployment
@@ -97,7 +97,7 @@ VITE_GOOGLE_CLIENT_ID=your-google-client-id
 VITE_YAHOO_CLIENT_ID=your-yahoo-client-id
 
 # Node.js Configuration (for Azure App Services)
-PORT=5173
+PORT=8080
 NODE_ENV=production
 ```
 
@@ -140,7 +140,7 @@ If you encounter build errors:
 
 ### Runtime Issues
 
-1. **Port configuration**: The application runs on port 5173 by default
+1. **Port configuration**: The application runs on port 8080 by default (changed from 5173 to match Azure App Service default)
 2. **Environment variables**: Ensure all required environment variables are set
 3. **CORS issues**: Verify that the backend is configured to accept requests from your frontend origin
 

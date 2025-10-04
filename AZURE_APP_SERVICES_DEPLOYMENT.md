@@ -35,7 +35,7 @@ This document provides instructions for deploying the frontend application to Az
 
 5. **Configure deployment settings:**
    ```bash
-   az webapp config appsettings set --resource-group aiva-frontend-rg --name aiva-frontend-app --settings PORT=5173
+   az webapp config appsettings set --resource-group aiva-frontend-rg --name aiva-frontend-app --settings PORT=8080
    ```
 
 6. **Set the startup command:**
@@ -111,7 +111,7 @@ VITE_GOOGLE_CLIENT_ID=your-google-client-id
 VITE_YAHOO_CLIENT_ID=your-yahoo-client-id
 
 # Node.js Configuration
-PORT=5173
+PORT=8080
 NODE_ENV=production
 ```
 
