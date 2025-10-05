@@ -8,16 +8,22 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview --host 0.0.0.0 --port 5173",
-    "start": "node server.js",
-    "start:prod": "npm run build && node server.js"
+    "preview": "vite preview",
+    "setup-workspace": "node server/src/scripts/ensure-default-workspace.js",
+    "dev:full": "concurrently \"npm run dev\" \"cd server && npm run dev\""
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@azure/ai-form-recognizer": "^5.1.0",
+    "@azure/app-configuration": "^1.9.0",
+    "@azure/data-tables": "^13.3.1",
+    "@azure/identity": "^4.12.0",
+    "@azure/keyvault-secrets": "^4.10.0",
     "@azure/msal-browser": "^4.22.1",
     "@azure/storage-blob": "^12.28.0",
+    "@azure/storage-queue": "^12.27.0",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -51,14 +57,19 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "cors": "^2.8.5",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.6.1",
     "embla-carousel-react": "^8.3.0",
     "express": "^4.21.2",
     "http-proxy-middleware": "^3.0.5",
     "input-otp": "^1.2.4",
     "js-md4": "^0.3.2",
     "lucide-react": "^0.462.0",
+    "mssql": "^10.0.4",
+    "multer": "^2.0.2",
     "next-themes": "^0.3.0",
+    "node-fetch": "^2.7.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -69,11 +80,13 @@
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "tedious": "^18.6.1",
     "uuid": "^11.1.0",
     "vaul": "^0.9.3",
-    "vite": "^5.4.1",
-    "zod": "^3.23.8",
-     "@eslint/js": "^9.9.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
     "@tailwindcss/typography": "^0.5.15",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.5.5",
@@ -81,6 +94,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.2.1",
     "eslint": "^9.9.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
@@ -89,9 +103,7 @@
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
-    "typescript-eslint": "^8.0.1"
-  },
-  "devDependencies": {
-    
+    "typescript-eslint": "^8.0.1",
+    "vite": "^5.4.1"
   }
 }

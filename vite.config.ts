@@ -7,19 +7,16 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 8080,  // Changed from 5173 to 8080 to match Azure App Service default port
+    port: 5173,
     strictPort: true,
     proxy: {
       "/api": {
-        target: "https://web-production-50913.up.railway.app",
+        target: "http://localhost:3001",
         changeOrigin: true,
-        secure: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
       },
     },
-  },
-  preview: {
-    host: true,
-    port: 8080,  // Changed from 5173 to 8080 to match Azure App Service default port
   },
   plugins: [
     react(),
@@ -31,17 +28,4 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: {
-    outDir: "dist",
-    assetsDir: "assets",
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tooltip'],
-        }
-      }
-    }
-  }
 }));

@@ -2,6 +2,12 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import { DocumentAnalysisClient, AzureKeyCredential } from '@azure/ai-form-recognizer';
+import multer from 'multer';
+import dotenv from 'dotenv';
+
+// Load environment variables from server/.env file
+dotenv.config({ path: path.resolve(process.cwd(), 'server/.env.cleaned') });
 
 // Create __dirname equivalent for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -9,6 +15,22 @@ const __dirname = path.dirname(__filename);
 
 // Create Express app
 const app = express();
+
+// Initialize Azure Document Intelligence client (if environment variables are available)
+let documentIntelligenceClient = null;
+try {
+  const endpoint = process.env.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT;
+  const apiKey = process.env.AZURE_DOCUMENT_INTELLIGENCE_KEY;
+  
+  if (endpoint && apiKey) {
+    documentIntelligenceClient = new DocumentAnalysisClient(endpoint, new AzureKeyCredential(apiKey));
+    console.log('✅ Azure Document Intelligence client initialized');
+  } else {
+    console.log('⚠️ Azure Document Intelligence not configured (missing environment variables)');
+  }
+} catch (error) {
+  console.error('❌ Failed to initialize Azure Document Intelligence client:', error.message);
+}
 
 // Add comprehensive CORS headers for all requests
 app.use((req, res, next) => {
@@ -41,12 +63,12 @@ app.get('/test', (req, res) => {
 });
 
 // Proxy API requests to the backend service with CORS handling
-const API_BASE_URL = process.env.VITE_APP_URL || 'https://web-production-50913.up.railway.app';
+const API_BASE_URL = 'https://web-production-50913.up.railway.app/';
 
-// Custom middleware to handle API requests
+// Custom middleware to handle API requests - PLACE BEFORE BODY PARSING
 app.use((req, res, next) => {
   // Check if the request is for an API endpoint
-  if (req.url.startsWith('/api/')) {
+  if (req.url.startsWith('/api/') && !req.url.startsWith('/api/document-intelligence')) {
     console.log('API request:', req.method, req.url);
     
     // Create proxy middleware
@@ -54,7 +76,10 @@ app.use((req, res, next) => {
       target: API_BASE_URL,
       changeOrigin: true,
       secure: true,
-      // Don't modify the path - keep it as is
+      // Preserve the original path
+      pathRewrite: {
+        '^/api': '/api'
+      },
       on: {
         proxyReq: function (proxyReq, req, res) {
           console.log('Forwarding to backend:', req.method, req.url);
@@ -78,9 +103,101 @@ app.use((req, res, next) => {
     // Apply the proxy middleware to this request
     proxy(req, res, next);
   } else {
-    // Not an API request, continue with other middleware
+    // Not an API request or it's a document-intelligence request, continue with other middleware
     next();
   }
+});
+
+// Body parsing middleware for JSON and form data - PLACE AFTER PROXY
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Configure multer for file uploads
+const upload = multer({ limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
+
+// Azure Document Intelligence API endpoints
+// Direct card scanning endpoint (bypassing backend)
+app.post('/api/document-intelligence/scan-card', upload.single('cardImage'), async (req, res) => {
+  try {
+    if (!documentIntelligenceClient) {
+      return res.status(503).json({ error: 'Azure Document Intelligence service is not available' });
+    }
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    console.log('Processing card scan request with Azure Document Intelligence');
+    
+    // Analyze the document using Azure Document Intelligence
+    const poller = await documentIntelligenceClient.beginAnalyzeDocument('prebuilt-idDocument', req.file.buffer);
+    const { documents } = await poller.pollUntilDone();
+    
+    if (!documents || documents.length === 0) {
+      return res.status(400).json({ error: 'No documents found in the analysis result' });
+    }
+    
+    const document = documents[0];
+    const fields = document.fields;
+    
+    // Extract common passport/card fields
+    const cardData = {
+      name: (fields.FirstName?.value || '') + ' ' + (fields.LastName?.value || ''),
+      passportNumber: fields.DocumentNumber?.value || '',
+      nationality: fields.CountryRegion?.value || fields.Nationality?.value || fields.Country?.value || '',
+      sex: fields.Sex?.value || fields.Gender?.value || '',
+      birthDate: fields.DateOfBirth?.value || '',
+      expiryDate: fields.DateOfExpiration?.value || ''
+    };
+    
+    // Clean up name by removing extra spaces
+    cardData.name = cardData.name.trim().replace(/\s+/g, ' ');
+    
+    // Try alternative field names for nationality if not found
+    if (!cardData.nationality) {
+      // Check for common alternative field names
+      const nationalityFields = ['Nationality', 'Country', 'IssuingCountry', 'CountryOfIssue'];
+      for (const field of nationalityFields) {
+        const value = fields[field]?.value;
+        if (value) {
+          cardData.nationality = String(value);
+          break;
+        }
+      }
+    }
+    
+    // Add any additional fields that might be present
+    for (const [key, value] of Object.entries(fields)) {
+      if (!(key in cardData) && value && 'value' in value) {
+        cardData[key] = String(value.value);
+      }
+    }
+    
+    console.log('Successfully analyzed card document', cardData);
+    
+    res.json({
+      message: 'Card scanned successfully',
+      cardData
+    });
+  } catch (error) {
+    console.error('Card scan error:', error);
+    res.status(500).json({ 
+      error: 'Failed to scan card',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Check Azure Document Intelligence service status
+app.get('/api/document-intelligence/status', (req, res) => {
+  res.json({
+    service: 'Azure Document Intelligence',
+    status: documentIntelligenceClient ? 'available' : 'unavailable',
+    endpoint: process.env.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT || null,
+    message: documentIntelligenceClient 
+      ? 'Service is ready to process documents' 
+      : 'Service is not configured. Please set AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT and AZURE_DOCUMENT_INTELLIGENCE_KEY environment variables.'
+  });
 });
 
 // Serve static files from the dist directory
@@ -106,7 +223,7 @@ app.use((err, req, res, next) => {
 });
 
 // Get port from environment variable or default to 8080
-const PORT = process.env.PORT || 8080;
+const PORT = 8080; // Explicitly set to 8080 as requested
 
 // Start server
 const server = app.listen(PORT, '0.0.0.0', () => {
@@ -114,6 +231,13 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Health check endpoint: http://localhost:${PORT}/health`);
   console.log(`API Base URL: ${API_BASE_URL}`);
   console.log(`Node version: ${process.version}`);
+  
+  // Show Azure Document Intelligence status
+  if (documentIntelligenceClient) {
+    console.log(`Azure Document Intelligence: Connected to ${process.env.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT}`);
+  } else {
+    console.log('Azure Document Intelligence: Not configured');
+  }
 })
 .on('error', (err) => {
   console.error('Failed to start server:', err);
