@@ -11,7 +11,8 @@ import {
   Menu,
   X,
   MessageSquare,
-  MoveLeftIcon
+  MoveLeftIcon,
+  CreditCard
 } from 'lucide-react';
 import UserManagement from './admin/UserManagement';
 import ConfigurationManagement from './admin/ConfigurationManagement';
@@ -21,13 +22,14 @@ import FeedbackManagement from './admin/FeedbackManagement';
 import DataQueryPanel from './DataQueryPanel';
 import WorkspaceManagement from './admin/WorkspaceManagement';
 import KeyVaultManagement from './admin/KeyVaultManagement';
+import CardDataView from './admin/CardDataView';
 
 interface AdminDashboardProps {
   admin: any;
   onLogout: () => void;
 }
 
-type TabType = 'users' | 'config' | 'monitoring' | 'disliked' | 'feedback' | 'datasources' | 'workspaces' | 'keyvault';
+type TabType = 'users' | 'config' | 'monitoring' | 'disliked' | 'feedback' | 'datasources' | 'workspaces' | 'keyvault' | 'carddata';
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ admin, onLogout }) => {
   const [activeTab, setActiveTab] = useState<TabType>('users');
@@ -36,6 +38,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ admin, onLogout }) => {
   const tabs = [
     { id: 'users' as TabType, name: 'User Management', icon: Users, color: 'text-blue-500' },
     { id: 'workspaces' as TabType, name: 'Workspaces', icon: Settings, color: 'text-indigo-500' },
+    { id: 'carddata' as TabType, name: 'Card Data', icon: CreditCard, color: 'text-green-500' },
     { id: 'config' as TabType, name: 'System Configuration', icon: Cloud, color: 'text-green-500' },
     { id: 'monitoring' as TabType, name: 'System Monitor', icon: Activity, color: 'text-orange-500' },
     { id: 'disliked' as TabType, name: 'Disliked Messages', icon: Shield, color: 'text-red-500' },
@@ -50,6 +53,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ admin, onLogout }) => {
         return <UserManagement />;
       case 'workspaces':
         return <WorkspaceManagement />;
+      case 'carddata':
+        return <CardDataView />;
       case 'config':
         return <ConfigurationManagement />;
       case 'monitoring':

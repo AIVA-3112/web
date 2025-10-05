@@ -32,7 +32,9 @@ import {
   RefreshCw,
   Users,
   LogOut,
-  File as FileIcon
+  File as FileIcon,
+  CreditCard,
+  Scan
 } from 'lucide-react';
 import SimpleMarkdown from '../components/SimpleMarkdown';
 import AboutAIVA from '../components/AboutAIVA';
@@ -42,6 +44,8 @@ import DislikedMessagesPage from '../components/DislikedMessagesPage';
 import HistoryPage from '../components/HistoryPage';
 import WorkspacesPage from '../components/WorkspacesPage';
 import FeedbackPage from '../components/FeedbackPage';
+
+import CardScanning from '../components/CardScanning';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -71,7 +75,7 @@ interface PendingFile {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onLogout, onSwitchAccount,onNavigateToHome, user,onNavigateToDashboard}) => {
-  const [currentView, setCurrentView] = useState<'chat' | 'about' | 'bookmarks' | 'liked' | 'disliked' | 'history' | 'workspaces' | 'feedback'>('chat');
+  const [currentView, setCurrentView] = useState<'chat' | 'about' | 'bookmarks' | 'liked' | 'disliked' | 'history' | 'workspaces' | 'feedback' | 'cardscan'>('chat');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -1048,6 +1052,14 @@ Shared from AIVA Chat System`;
         />
       )}
       
+
+      
+      {currentView === 'cardscan' && (
+        <CardScanning 
+          onBack={() => setCurrentView('chat')} 
+        />
+      )}
+      
       {currentView === 'chat' && (
       <div className="h-screen bg-slate-100 flex overflow-hidden flex-shrink-0">
       {/* Sidebar */}
@@ -1073,6 +1085,16 @@ Shared from AIVA Chat System`;
             <Building2 className="w-5 h-5" />
             {sidebarOpen && <span>About AIVA</span>}
           </div>
+          
+          <div 
+            onClick={() => setCurrentView('cardscan')}
+            className="flex items-center space-x-3 p-3 hover:bg-slate-700 rounded-lg cursor-pointer transition-colors"
+          >
+            <Scan className="w-5 h-5" />
+            {sidebarOpen && <span>Scan Card</span>}
+          </div>
+          
+
           
           <div 
             onClick={() => setCurrentView('bookmarks')}

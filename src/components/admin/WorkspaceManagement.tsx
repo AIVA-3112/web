@@ -125,8 +125,16 @@ const WorkspaceManagement: React.FC = () => {
     e.preventDefault();
     if (!editingWorkspace || !editingWorkspace.name.trim()) return;
     
+    // Only send the fields that can be updated
+    const updateData = {
+      name: editingWorkspace.name,
+      description: editingWorkspace.description,
+      color: editingWorkspace.color,
+      isShared: editingWorkspace.isShared
+    };
+    
     try {
-      const data = await adminAPI.updateWorkspace(editingWorkspace.id, editingWorkspace);
+      const data = await adminAPI.updateWorkspace(editingWorkspace.id, updateData);
       setWorkspaces(prev => 
         prev.map(ws => 
           ws.id === editingWorkspace.id 
@@ -287,7 +295,7 @@ const WorkspaceManagement: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center space-x-1 opacity-100 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => handleManageFiles(workspace)}
                     className="p-1 hover:bg-blue-100 rounded transition-colors"
@@ -304,17 +312,17 @@ const WorkspaceManagement: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setEditingWorkspace(workspace)}
-                    className="p-1 hover:bg-gray-200 rounded transition-colors"
+                    className="p-1 hover:bg-blue-100 rounded transition-colors"
                     title="Edit Workspace"
                   >
-                    <Edit2 className="w-3 h-3 text-gray-600" />
+                    <Edit2 className="w-4 h-4 text-blue-600" />
                   </button>
                   <button
                     onClick={() => handleDeleteWorkspace(workspace.id)}
                     className="p-1 hover:bg-red-100 rounded transition-colors"
                     title="Delete Workspace"
                   >
-                    <Trash2 className="w-3 h-3 text-red-600" />
+                    <Trash2 className="w-4 h-4 text-red-600" />
                   </button>
                 </div>
               </div>

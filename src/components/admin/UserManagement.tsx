@@ -163,8 +163,10 @@ const UserManagement: React.FC = () => {
       fetchUsers();
       setShowCreateModal(false);
       resetForm();
-    } catch (error) {
+      alert('User created successfully!');
+    } catch (error: any) {
       console.error('Failed to create user:', error);
+      alert(`Failed to create user: ${error.message || 'Unknown error'}`);
     }
   };
 

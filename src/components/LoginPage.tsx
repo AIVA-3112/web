@@ -12,8 +12,8 @@ interface LoginPageProps {
 
 const LoginPage: React.FC<LoginPageProps> = ({ onBack, onLoginSuccess, onNavigateToSignUp, onNavigateToHome, onNavigateToAdminLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('sudhenreddym@gmail.com'); // Pre-filled with test credentials
+  const [password, setPassword] = useState('password123'); // Pre-filled with test credentials
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [socialLoginError, setSocialLoginError] = useState<string | null>(null);
@@ -29,12 +29,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onBack, onLoginSuccess, onNavigat
           const user = getCurrentMicrosoftUser();
           if (user) {
             console.log('User already logged in with Microsoft:', user);
-            // Optionally auto-login the user
-            // onLoginSuccess({
-            //   name: user.name,
-            //   email: user.email,
-            //   avatar: user.name ? user.name.substring(0, 2).toUpperCase() : 'MS'
-            // });
           }
         }
       } catch (error) {
@@ -356,9 +350,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onBack, onLoginSuccess, onNavigat
               {/* Sign In Button */}
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 rounded-[30px] text-white font-semibold py-3 px-4 transition-all duration-300 transform hover:scale-105 animate-pulse-glow shadow-lg hover:shadow-blue-500/20"
+                disabled={isLoading === 'local'}
+                className="w-full bg-blue-600 hover:bg-blue-700 rounded-[30px] text-white font-semibold py-3 px-4 transition-all duration-300 transform hover:scale-105 animate-pulse-glow shadow-lg hover:shadow-blue-500/20 disabled:opacity-50"
               >
-                Sign In
+                {isLoading === 'local' ? (
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                    Signing In...
+                  </div>
+                ) : (
+                  'Sign In'
+                )}
               </button>
 
               {/* Admin Login Button */}
@@ -408,7 +410,21 @@ const LoginPage: React.FC<LoginPageProps> = ({ onBack, onLoginSuccess, onNavigat
 
               {/* Social Login Buttons */}
               <div className="space-y-3">
-        
+                <button
+                  type="button"
+                  onClick={() => handleSocialLogin('google')}
+                  disabled={isLoading !== null}
+                  className="w-full bg-red-600 rounded-[30px] hover:bg-red-700 disabled:bg-red-400 text-white font-medium py-3 px-4 transition-all duration-300 transform hover:scale-105 disabled:transform-none flex items-center justify-center space-x-2 shadow-lg hover:shadow-red-500/20"
+                >
+                  {isLoading === 'google' ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <span className="text-lg font-bold">G</span>
+                      <span>Continue with Google</span>
+                    </>
+                  )}
+                </button>
                 
                 <button
                   type="button"
@@ -426,7 +442,21 @@ const LoginPage: React.FC<LoginPageProps> = ({ onBack, onLoginSuccess, onNavigat
                   )}
                 </button>
                 
-               
+                <button
+                  type="button"
+                  onClick={() => handleSocialLogin('yahoo')}
+                  disabled={isLoading !== null}
+                  className="w-full bg-purple-600 rounded-[30px] hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium py-3 px-4 transition-all duration-300 transform hover:scale-105 disabled:transform-none flex items-center justify-center space-x-2 shadow-lg hover:shadow-purple-500/20"
+                >
+                  {isLoading === 'yahoo' ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <span className="text-lg font-bold">Y!</span>
+                      <span>Continue with Yahoo</span>
+                    </>
+                  )}
+                </button>
               </div>
             </form>
           </div>

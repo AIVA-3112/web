@@ -1,6 +1,7 @@
 // API utility functions for frontend components
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://web-production-50913.up.railway.app/api';
+// Use relative paths for proxying in development, absolute URL for production
+const API_BASE_URL = '/api';
 
 // Get auth token from localStorage
 const getAuthToken = () => {
@@ -691,6 +692,59 @@ export const adminAPI = {
       body: JSON.stringify({ userId, accessLevel }),
     });
   }
+};
+
+// Card API functions
+export const cardAPI = {
+  async scanCard(file: File) {
+    const formData = new FormData();
+    formData.append('cardImage', file);
+    
+    const token = localStorage.getItem('authToken');
+    try {
+      // Use the direct endpoint for card scanning through the frontend server
+      const response = await fetch(`/api/document-intelligence/scan-card`, {
+        method: 'POST',
+        headers: token ? {
+          'Authorization': `Bearer ${token}`
+        } : {},
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        let errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          // ignore JSON parse error
+        }
+        console.error('Card Scan Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData
+        });
+        const error = new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+        (error as any).status = response.status;
+        (error as any).details = errorData;
+        throw error;
+      }
+      
+      return response.json();
+    } catch (err) {
+      console.error('Card Scan Request Failed:', err);
+      throw err;
+    }
+  },
+  
+  async getCards() {
+    return apiRequest('/admin/cards');
+  },
+  
+  async deleteCard(cardId: string) {
+    return apiRequest(`/admin/cards/${cardId}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
 // Helper function for FormData requests
