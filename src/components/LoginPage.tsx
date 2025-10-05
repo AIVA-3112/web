@@ -408,21 +408,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onBack, onLoginSuccess, onNavigat
 
               {/* Social Login Buttons */}
               <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={() => handleSocialLogin('google')}
-                  disabled={isLoading !== null}
-                  className="w-full bg-red-600 rounded-[30px] hover:bg-red-700 disabled:bg-red-400 text-white font-medium py-3 px-4 transition-all duration-300 transform hover:scale-105 disabled:transform-none flex items-center justify-center space-x-2 shadow-lg hover:shadow-red-500/20"
-                >
-                  {isLoading === 'google' ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      <span className="text-lg font-bold">G</span>
-                      <span>Continue with Google</span>
-                    </>
-                  )}
-                </button>
+        
                 
                 <button
                   type="button"
@@ -440,21 +426,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onBack, onLoginSuccess, onNavigat
                   )}
                 </button>
                 
-                <button
-                  type="button"
-                  onClick={() => handleSocialLogin('yahoo')}
-                  disabled={isLoading !== null}
-                  className="w-full bg-purple-600 rounded-[30px] hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium py-3 px-4 transition-all duration-300 transform hover:scale-105 disabled:transform-none flex items-center justify-center space-x-2 shadow-lg hover:shadow-purple-500/20"
-                >
-                  {isLoading === 'yahoo' ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      <span className="text-lg font-bold">Y!</span>
-                      <span>Continue with Yahoo</span>
-                    </>
-                  )}
-                </button>
+               
               </div>
             </form>
           </div>
