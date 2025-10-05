@@ -26,48 +26,7 @@ app.use((req, res, next) => {
   }
 });
 
-// Proxy API requests to the backend service with CORS handling
-const API_BASE_URL = process.env.VITE_API_URL || 'https://web-production-50913.up.railway.app/api';
-app.use('/api', createProxyMiddleware({
-  target: API_BASE_URL.replace('/api', ''), // Remove /api from the target as it's in the base URL
-  changeOrigin: true,
-  pathRewrite: {
-    '^/api': '/api', // Rewrite path
-  },
-  secure: true,
-  onProxyRes: function (proxyRes, req, res) {
-    // Add CORS headers to proxied responses
-    proxyRes.headers['Access-Control-Allow-Origin'] = '*';
-    proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH';
-    proxyRes.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-API-Key, X-Client-ID';
-    proxyRes.headers['Access-Control-Expose-Headers'] = 'X-Total-Count, X-Page-Count';
-    proxyRes.headers['Access-Control-Allow-Credentials'] = 'true';
-    
-    // Specifically handle image responses
-    if (proxyRes.headers['content-type'] && proxyRes.headers['content-type'].includes('image')) {
-      proxyRes.headers['Cache-Control'] = 'public, max-age=31536000'; // Cache images for 1 year
-    }
-  },
-  onError: function (err, req, res) {
-    console.error('Proxy error:', err);
-    res.status(500).json({ error: 'Proxy error', message: err.message });
-  }
-}));
-
-// Serve static files from the dist directory
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Handle SPA routing - serve index.html for all non-API routes
-app.get(/^\/(?!api).*/, (req, res) => {
-  try {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-  } catch (error) {
-    console.error('Error serving index.html:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-// Health check endpoint
+// Health check endpoint (placed before proxy to avoid interference)
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
@@ -79,6 +38,62 @@ app.get('/test', (req, res) => {
     timestamp: new Date().toISOString(),
     nodeVersion: process.version
   });
+});
+
+// Proxy API requests to the backend service with CORS handling
+const API_BASE_URL = process.env.VITE_APP_URL || 'https://web-production-50913.up.railway.app';
+
+// Custom middleware to handle API requests
+app.use((req, res, next) => {
+  // Check if the request is for an API endpoint
+  if (req.url.startsWith('/api/')) {
+    console.log('API request:', req.method, req.url);
+    
+    // Create proxy middleware
+    const proxy = createProxyMiddleware({
+      target: API_BASE_URL,
+      changeOrigin: true,
+      secure: true,
+      // Don't modify the path - keep it as is
+      on: {
+        proxyReq: function (proxyReq, req, res) {
+          console.log('Forwarding to backend:', req.method, req.url);
+        },
+        proxyRes: function (proxyRes, req, res) {
+          console.log('Backend response status:', proxyRes.statusCode);
+          // Add CORS headers to proxied responses
+          proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+          proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH';
+          proxyRes.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-API-Key, X-Client-ID';
+          proxyRes.headers['Access-Control-Expose-Headers'] = 'X-Total-Count, X-Page-Count';
+          proxyRes.headers['Access-Control-Allow-Credentials'] = 'true';
+        },
+        error: function (err, req, res) {
+          console.error('Proxy error:', err);
+          res.status(500).json({ error: 'Proxy error', message: err.message });
+        }
+      }
+    });
+    
+    // Apply the proxy middleware to this request
+    proxy(req, res, next);
+  } else {
+    // Not an API request, continue with other middleware
+    next();
+  }
+});
+
+// Serve static files from the dist directory
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Handle SPA routing - serve index.html for all non-API routes
+app.get(/^\/(?!api|health|test).*$/, (req, res) => {
+  try {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  } catch (error) {
+    console.error('Error serving index.html:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // Error handling middleware
