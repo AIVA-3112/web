@@ -29,7 +29,7 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
         "Contextual conversations that remember your previous questions",
         "Smart suggestions for follow-up queries"
       ],
-      imagePlaceholder: "/src/components/assets/chat_interface.png"
+      imagePlaceholder: "/assets/chat_interface.png"
     },
     {
       id: 2,
@@ -41,7 +41,7 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
         "Password recovery and multi-factor authentication",
         " Audit logs for user activities"
       ],
-      imagePlaceholder: "/src/components/assets/securlogin.png"
+      imagePlaceholder: "/assets/securlogin.png"
     },
     {
       id: 3,
@@ -53,7 +53,7 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
         "Custom report generation and scheduling",
         "Data export capabilities in multiple formats"
       ],
-      imagePlaceholder: "/src/components/assets/data_query_panel.png"
+      imagePlaceholder: "/assets/data_query_panel.png"
     },
     {
       id: 4,
@@ -65,7 +65,7 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
         "Role-based access control and permissions",
         "Collaborative annotations and comments"
       ],
-      imagePlaceholder: "/src/components/assets/workspaces.png"
+      imagePlaceholder: "/assets/workspaces.png"
     },
     {
       id: 5,
@@ -77,7 +77,7 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
         "Tag and categorize conversations",
         "Quick access to frequently used analyses"
       ],
-      imagePlaceholder: "/src/components/assets/chathistory.png"
+      imagePlaceholder: "/assets/chathistory.png"
     },
     {
       id: 6,
@@ -89,7 +89,7 @@ const AIVAPresentation: React.FC<AIVAPresentationProps> = ({ isOpen, onClose }) 
         " Data source integrations and monitoring",
         " Audit logs and activity tracking"
       ],
-      imagePlaceholder: "/src/components/assets/adminportal.png"
+      imagePlaceholder: "/assets/adminportal.png"
     }
   ];
 
